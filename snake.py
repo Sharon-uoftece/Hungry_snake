@@ -47,13 +47,11 @@ class BOMB:
         self.bombColor = (0,0,0)
 
     def draw_bomb(self,screen):
-        # display_surface.fill((0,0,0))
-        # pygame.display.set_caption('GAME OVER')
-        # image = pygame.image.load('bomb.png')
-        # screen.blit(image,(0,0))
-
-        bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
-        screen.blit(bomb,bomb_rect)
+        counter = 5
+        while counter > 0 :
+            bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
+            screen.blit(bomb,bomb_rect)
+            counter -= 1
 
 class MAIN:
     def __init__(self):
