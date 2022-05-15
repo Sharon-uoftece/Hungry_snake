@@ -8,8 +8,8 @@ class SNAKE:
         # self.body = [Vector2(5,10),Vector2(6,10),Vector2(7,10)]
         self.direction = random.choice([Vector2(1,0),Vector2(0,1),
                                     Vector2(-1,0),Vector2(0,-1)])
-        self.x = random.randint(0,20)
-        self.y = random.randint(0,20)
+        self.x = random.randint(10,18)
+        self.y = random.randint(10,18)
         self.head = Vector2(self.x,self.y)
         self.body = [self.head, self.head + self.direction, self.head + 2* self.direction]
         self.snakeColor = (0,0,225)
@@ -42,9 +42,15 @@ class BOMB:
         self.x = random.randint(0,cell_number-1)
         self.y = random.randint(0,cell_number-1)
         self.pos = Vector2(self.x,self.y)
+        self.image = pygame.image.load('bomb.png')
         self.bombColor = (0,0,0)
 
-    def draw_bomb(self):
+    def draw_bomb(self,screen):
+        # display_surface.fill((0,0,0))
+        # pygame.display.set_caption('GAME OVER')
+        # image = pygame.image.load('bomb.png')
+        # screen.blit(image,(0,0))
+
         bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
         pygame.draw.rect(screen,self.bombColor,bomb_rect)
 
@@ -55,6 +61,7 @@ class MAIN:
         self.bomb = BOMB()
         self.boundary = (-1,50)
         self.fruitCount = 0
+        self.screen = pygame.display.set_mode((1000,1000))
 
     def update(self):
         self.snake.move_snake()
@@ -66,7 +73,7 @@ class MAIN:
     def draw_elements(self):
         self.fruit.draw_fruit()
         self.snake.draw_snake()
-        self.bomb.draw_bomb()
+        self.bomb.draw_bomb(self.screen)
         
     def check_eatFruit(self):
         if self.fruit.pos == self.snake.body[0]:
@@ -79,33 +86,42 @@ class MAIN:
     
     def check_hitBomb(self):
         if self.bomb.pos == self.snake.body[0]:
-            pygame.time.wait(500)
+            pygame.time.wait(200)
+            self.gameOver()
             self.snake = SNAKE()
             self.fruit = FRUIT()
-            self.draw_elements()
 
     def check_hitWall(self):
         for cor in self.snake.body[0]:
             if cor in self.boundary:
-                pygame.time.wait(300)
-                # black = (0,0,0)
-                # x = 400
-                # y = 400
-                # display_surface = pygame.display.set_mode((x,y))
-                # pygame.display.set_caption('GAME OVER')
-                # image = pygame.image.load('pixel2.png')
-
-                # while True:
-                #     display_surface.fill(black)
-                #     display_surface.blit(image,(0,0))
-
+                print(self.snake.body[0])
+                pygame.time.wait(200)
+                self.gameOver()
                 self.snake = SNAKE()
                 self.fruit = FRUIT()
     
     def check_hitSelf(self):
         for p in self.snake.body[1:]:
             if self.snake.body[0] == p:
-                print("hit self") 
+                continue
+
+    def gameOver(self):
+        color = (0, 0, 0)
+        display_surface = pygame.display.set_mode((1000, 1000))
+        pygame.display.set_caption('GAME OVER')
+        image = pygame.image.load('gg.jpg')
+        temp = 3000
+        while temp > 0:
+            display_surface.fill(color)
+            display_surface.blit(image, (190, 240))
+            temp -= 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                        
+                pygame.display.update()
+
 
 pygame.init()
 cell_size = 20
@@ -124,7 +140,6 @@ pygame.time.set_timer(SCREEN_UPDATE,150)
 
 main_game = MAIN()
 while True:
-    prev = 2
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -143,11 +158,9 @@ while True:
             else:
                 continue
 
-            prev = event.key
-
-    screen.fill((74,139,48))
+    screen.fill((74,142,48))
     # fruit.draw_fruit()
     # snake.draw_snake()
     main_game.draw_elements()
     pygame.display.update()
-    clock.tick(6000)   
+    clock.tick(60000)   
