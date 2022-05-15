@@ -2,17 +2,18 @@ import pygame
 import sys #system functions, e.g. quit(stop running code)
 import random
 from pygame.math import Vector2
+
 class SNAKE:
     def __init__(self):
 
         # self.body = [Vector2(5,10),Vector2(6,10),Vector2(7,10)]
         self.direction = random.choice([Vector2(1,0),Vector2(0,1),
                                     Vector2(-1,0),Vector2(0,-1)])
-        self.x = random.randint(10,18)
-        self.y = random.randint(10,18)
+        self.x = random.randint(10,12)
+        self.y = random.randint(10,12)
         self.head = Vector2(self.x,self.y)
         self.body = [self.head, self.head + self.direction, self.head + 2* self.direction]
-        self.snakeColor = (0,0,225)
+        self.snakeColor = (80,80,200)
 
     def draw_snake(self):
         for block in self.body:
@@ -31,12 +32,18 @@ class FRUIT:
         self.x = random.randint(0,cell_number-1)
         self.y = random.randint(0,cell_number-1)
         self.pos = Vector2(self.x,self.y)
-        self.fruitColor = (220,166,114)
+        self.ran = random.randint(0,3)
 
     def draw_fruit(self):
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
-        screen.blit(apple,fruit_rect)
-        #pygame.draw.rect(screen,self.fruitColor,fruit_rect)
+        if self.ran == 0:
+            screen.blit(apple,fruit_rect)
+        elif self.ran == 1:
+            screen.blit(cherry,fruit_rect)
+        elif self.ran == 2:
+            screen.blit(yuzu,fruit_rect)
+        elif self.ran == 3:
+            screen.blit(avocado,fruit_rect)
 
 class BOMB: 
     def __init__(self):
@@ -47,18 +54,15 @@ class BOMB:
         self.bombColor = (0,0,0)
 
     def draw_bomb(self,screen):
-        counter = 5
-        while counter > 0 :
-            bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
-            screen.blit(bomb,bomb_rect)
-            counter -= 1
+        bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
+        screen.blit(bomb,bomb_rect)
 
 class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
         self.bomb = BOMB()
-        self.boundary = (-1,20)
+        self.boundary = (-1,cell_number)
         self.fruitCount = 0
         self.screen = pygame.display.set_mode((screen_width,screen_width))
 
@@ -83,6 +87,9 @@ class MAIN:
             self.fruit = FRUIT()
             self.draw_elements()
     
+    # def random_fruit(self):
+    #     continue
+        
     def check_hitBomb(self):
         if self.bomb.pos == self.snake.body[0]:
             self.gameOver()
@@ -104,14 +111,14 @@ class MAIN:
 
     def gameOver(self):
         pygame.time.wait(700)
-        color = (255, 255, 255)
+        color = (140,185,140)
         display_surface = pygame.display.set_mode((screen_width, screen_width))
         pygame.display.set_caption('GAME OVER')
-        image = pygame.image.load('gg.png')
+        image = pygame.image.load('gg.png').convert_alpha()
         image_rect = image.get_rect()
         screen_rect = screen.get_rect()
         image_rect.center = screen_rect.center
-        temp = 45000
+        temp = 10000
         while temp > 0:
             display_surface.fill(color)
             display_surface.blit(image, image_rect)
@@ -131,6 +138,9 @@ screen_width = cell_size * cell_number
 screen = pygame.display.set_mode((screen_width,screen_width))
 clock = pygame.time.Clock()
 apple = pygame.image.load('apple.png').convert_alpha()
+cherry = pygame.image.load('cherry.png').convert_alpha()
+avocado = pygame.image.load('avocado.png').convert_alpha()
+yuzu = pygame.image.load('yuzu.png').convert_alpha()
 bomb = pygame.image.load('bomb.png').convert_alpha()
 
 SCREEN_UPDATE = pygame.USEREVENT
@@ -160,7 +170,7 @@ while True:
             else:
                 continue
 
-    screen.fill((74,140,56))
+    screen.fill((140,185,140))
     # fruit.draw_fruit()
     # snake.draw_snake()
     main_game.draw_elements()
