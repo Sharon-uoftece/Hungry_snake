@@ -2,4 +2,4 @@
 
 The CLASSIC snake game!
 ---
-![image](https://user-images.githubusercontent.com/59318822/168458205-01d3f2ee-c5a5-459b-a9c5-1b3947019005.png)
+![image](https://user-images.githubusercontent.com/59318822/168458267-34811320-df8d-4345-8ed7-d14b318f56a4.png)
