@@ -35,7 +35,8 @@ class FRUIT:
 
     def draw_fruit(self):
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
-        pygame.draw.rect(screen,self.fruitColor,fruit_rect)
+        screen.blit(apple,fruit_rect)
+        #pygame.draw.rect(screen,self.fruitColor,fruit_rect)
 
 class BOMB: 
     def __init__(self):
@@ -52,16 +53,16 @@ class BOMB:
         # screen.blit(image,(0,0))
 
         bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
-        pygame.draw.rect(screen,self.bombColor,bomb_rect)
+        screen.blit(bomb,bomb_rect)
 
 class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
         self.bomb = BOMB()
-        self.boundary = (-1,50)
+        self.boundary = (-1,20)
         self.fruitCount = 0
-        self.screen = pygame.display.set_mode((1000,1000))
+        self.screen = pygame.display.set_mode((screen_width,screen_width))
 
     def update(self):
         self.snake.move_snake()
@@ -86,7 +87,6 @@ class MAIN:
     
     def check_hitBomb(self):
         if self.bomb.pos == self.snake.body[0]:
-            pygame.time.wait(200)
             self.gameOver()
             self.snake = SNAKE()
             self.fruit = FRUIT()
@@ -95,7 +95,6 @@ class MAIN:
         for cor in self.snake.body[0]:
             if cor in self.boundary:
                 print(self.snake.body[0])
-                pygame.time.wait(200)
                 self.gameOver()
                 self.snake = SNAKE()
                 self.fruit = FRUIT()
@@ -106,14 +105,18 @@ class MAIN:
                 continue
 
     def gameOver(self):
-        color = (0, 0, 0)
-        display_surface = pygame.display.set_mode((1000, 1000))
+        pygame.time.wait(700)
+        color = (255, 255, 255)
+        display_surface = pygame.display.set_mode((screen_width, screen_width))
         pygame.display.set_caption('GAME OVER')
-        image = pygame.image.load('gg.jpg')
-        temp = 3000
+        image = pygame.image.load('gg.png')
+        image_rect = image.get_rect()
+        screen_rect = screen.get_rect()
+        image_rect.center = screen_rect.center
+        temp = 45000
         while temp > 0:
             display_surface.fill(color)
-            display_surface.blit(image, (190, 240))
+            display_surface.blit(image, image_rect)
             temp -= 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -125,15 +128,12 @@ class MAIN:
 
 pygame.init()
 cell_size = 20
-cell_number = 50
+cell_number = 20
 screen_width = cell_size * cell_number
-
-#initailize the display surface
 screen = pygame.display.set_mode((screen_width,screen_width))
-#initialize a clock and can later set to different parameter
-#for purpose of uniforming running speed of game
-#if tick(60), loop 60 times in one min
 clock = pygame.time.Clock()
+apple = pygame.image.load('apple.png').convert_alpha()
+bomb = pygame.image.load('bomb.png').convert_alpha()
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE,150) 
@@ -148,19 +148,23 @@ while True:
             main_game.update()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and event.key != pygame.K_DOWN:
-                main_game.snake.direction = Vector2(0,-1)
+                if main_game.snake.direction.y != 1:
+                    main_game.snake.direction = Vector2(0,-1)
             elif event.key  == pygame.K_DOWN:
-                main_game.snake.direction = Vector2(0,1)
+                if main_game.snake.direction.y != -1:
+                    main_game.snake.direction = Vector2(0,1)
             elif event.key  == pygame.K_LEFT:
-                main_game.snake.direction = Vector2(-1,0)
+                if main_game.snake.direction.x != 1:
+                    main_game.snake.direction = Vector2(-1,0)
             elif event.key  == pygame.K_RIGHT:
-                main_game.snake.direction = Vector2(1,0) 
+                if main_game.snake.direction.x != -1:
+                    main_game.snake.direction = Vector2(1,0) 
             else:
                 continue
 
-    screen.fill((74,142,48))
+    screen.fill((74,140,56))
     # fruit.draw_fruit()
     # snake.draw_snake()
     main_game.draw_elements()
     pygame.display.update()
-    clock.tick(60000)   
+    clock.tick(600)   
