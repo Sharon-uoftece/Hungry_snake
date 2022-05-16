@@ -15,26 +15,24 @@ class SNAKE:
         self.head = Vector2(self.x,self.y)
         self.body = [self.head, self.head + self.direction, self.head + 2* self.direction]
         self.snakeColor = (120,120,220)
-
     def draw_snake(self):
         for block in self.body:
             x_pos = int(block.x * cell_size)
             y_pos = int(block.y * cell_size)
             snake_rect = pygame.Rect(x_pos,y_pos,cell_size,cell_size)
             pygame.draw.rect(screen,self.snakeColor,snake_rect)
-
     def move_snake(self):
         body_copy = self.body[:-1]
         body_copy.insert(0,body_copy[0]+self.direction)
         self.body = body_copy[:] 
-
 class FRUIT: 
     def __init__(self):
-        self.x = random.randint(0,cell_number-5)
-        self.y = random.randint(0,cell_number-5)
+        self.list = list(range(0,cell_number-2))
+        self.randInput = self.list[::2]
+        self.x = random.choice(self.randInput)
+        self.y = random.choice(self.randInput)
         self.pos = Vector2(self.x,self.y)
-        self.ran = random.randint(0,5)
-
+        self.ran = random.randint(0,8)
     def draw_fruit(self):
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
         if self.ran == 0:
@@ -49,18 +47,28 @@ class FRUIT:
             screen.blit(carrott,fruit_rect)
         elif self.ran == 5:
             screen.blit(banana,fruit_rect)
-
+        elif self.ran == 6:
+            screen.blit(heart,fruit_rect)
+        elif self.ran == 7:
+            screen.blit(heart2,fruit_rect)
+        elif self.ran == 8:
+            screen.blit(heart3,fruit_rect)
 class BOMB: 
     def __init__(self):
-        self.x = random.randint(8,14)
-        self.y = random.randint(8,14)
+        self.x = random.randint(3,17)
+        self.y = random.randint(3,17)
         self.pos = Vector2(self.x,self.y)
-        self.image = pygame.image.load('bomb.png')
-        self.bombColor = (0,0,0)
-
+        self.ran = random.randint(0,3)
     def draw_bomb(self):
         bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
-        screen.blit(bomb,bomb_rect)
+        if self.ran == 0:
+            screen.blit(bomb,bomb_rect)
+        elif self.ran == 1:
+            screen.blit(skull,bomb_rect)
+        elif self.ran == 2:
+            screen.blit(poison,bomb_rect)
+        elif self.ran == 3:
+            screen.blit(poison2,bomb_rect)
 
 class MAIN:
     def __init__(self):
@@ -69,71 +77,82 @@ class MAIN:
         self.fruit2 = FRUIT()
         self.fruit3 = FRUIT() 
         self.bomb = BOMB()
+        self.bomb2 = BOMB()
         self.boundary = (-1,cell_number)
         self.screen = pygame.display.set_mode((screen_width,screen_width))
-
     def update(self):
         self.snake.move_snake()
         self.check_eatFruit()
         self.check_hitBomb()
         self.check_hitWall()
-        self.check_hitSelf()
         self.draw_score()
         self.check_visibility()
-        self.random_bomb()
-
     def draw_elements(self):
+        self.draw_grass()
         self.fruit.draw_fruit()
         self.fruit2.draw_fruit()
         self.fruit3.draw_fruit()
         self.snake.draw_snake()
         self.bomb.draw_bomb()
+        self.bomb2.draw_bomb()
         self.draw_score()
-
+    def draw_grass(self):
+        grass_color = (160,225,185)
+        for row in range(cell_number):
+            if row % 2 == 0:
+                for col in range(cell_number):
+                    if col % 2 == 0:
+                        grass_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
+                        pygame.draw.rect(screen,grass_color,grass_rect)                      
     def draw_score(self):
         score_text = str(len(self.snake.body)-3)
-        score_surface = game_font.render(score_text,True,(56,74,12))
-        score_x = int(cell_size * cell_number - 20)
-        score_y = int(cell_size * cell_number - 20)
+        score_surface = game_font.render(score_text,True,(56,94,12))
+        score_x = int(cell_size * cell_number - 30)
+        score_y = int(cell_size * cell_number - 30)
         score_rect = score_surface.get_rect(center = (score_x, score_y))
-        apple_rect = apple.get_rect(midright = (score_rect.left,score_rect.centery))
-        heart_rect = apple.get_rect(midright = (score_rect.left+100,score_rect.centery+100))
-        bg_rect = pygame.Rect(apple_rect.left,apple_rect.top,apple_rect.width+score_rect.width,apple_rect.height)
-        
-        pygame.draw.rect(screen,(167,209,61),bg_rect)
         screen.blit(score_surface,score_rect)
-        screen.blit(heart,heart_rect)
-        pygame.draw.rect(screen,(56,74,12),bg_rect,2)
-
     def check_eatFruit(self):
-        if self.fruit == self.snake.body[0]:
-            new = self.snake.body[-1] + self.snake.direction
-            self.snake.body.append(new)
-            time.sleep(999999)
+        if self.snake.body[0] == self.fruit.pos: 
+            if self.fruit.ran in [6,7,8]: 
+                for i in range(3):
+                    new = self.snake.body[-1] + self.snake.direction
+                    self.snake.body.append(new)
+                    i += 1
+            else: 
+                new = self.snake.body[-1] + self.snake.direction
+                self.snake.body.append(new)
             self.fruit = FRUIT()
-        if self.fruit2 == self.snake.body[0]:
-            new = self.snake.body[-1] + self.snake.direction
-            self.snake.body.append(new)
-            time.sleep(999999)
+        elif self.snake.body[0] == self.fruit2.pos:
+            if self.fruit.ran in [6,7,8]: 
+                for i in range(3):
+                    new = self.snake.body[-1] + self.snake.direction
+                    self.snake.body.append(new)
+                    i += 1
+            else: 
+                new = self.snake.body[-1] + self.snake.direction
+                self.snake.body.append(new)
             self.fruit2 = FRUIT()
-        if self.fruit3 == self.snake.body[0]:
-            new = self.snake.body[-1] + self.snake.direction
-            self.snake.body.append(new)
-            time.sleep(999999)
+        elif self.snake.body[0] == self.fruit3.pos:
+            if self.fruit.ran in [6,7,8]: 
+                for i in range(3):
+                    new = self.snake.body[-1] + self.snake.direction
+                    self.snake.body.append(new)
+                    i += 1
+            else: 
+                new = self.snake.body[-1] + self.snake.direction
+                self.snake.body.append(new)
             self.fruit3 = FRUIT()
-    
-    def random_bomb(self):
-        counter_bomb = 1000
-        while counter_bomb > 1:
-            if counter_bomb == 0:
-                self.bomb = BOMB() 
-                counter_bomb = 1000
-            counter_bomb -= 1
-
     def check_visibility(self):
         if self.fruit.pos == self.bomb.pos:
             self.bomb = BOMB()
-        for p in self.snake.body:
+            self.bomb2 = BOMB()
+        if self.fruit2.pos == self.bomb.pos:
+            self.bomb = BOMB()
+            self.bomb2 = BOMB()
+        if self.fruit3.pos == self.bomb.pos:
+            self.bomb = BOMB()
+            self.bomb2 = BOMB()
+        for p in self.snake.body[1:]:
             if self.fruit.pos == p:
                 self.fruit = FRUIT()
             if self.fruit2.pos == p:
@@ -141,41 +160,58 @@ class MAIN:
             if self.fruit3.pos == p:
                 self.fruit3 = FRUIT()
             if self.bomb.pos == p:
-                self.bomb = BOMB()
-        # counter_visibility = 50
-        # while counter_visibility > 0:
-        #     counter_visibility -= 1
-        #     print("counter visibility:",counter_visibility)
-        #     if counter_visibility == 0:
-        #         self.fruit == FRUIT()
-        #         counter_visibility = 50
-    
-    # def random_fruit(self):
-    #     continue
-        
+                self.bomb = BOMB() 
+            if self.bomb2.pos == p:
+                self.bomb2 = BOMB() 
     def check_hitBomb(self):
+        snake_head_x = self.snake.body[0][0]
+        snake_head_y = self.snake.body[0][1]
+        bomb_x = self.bomb.pos[0]
+        bomb_y = self.bomb.pos[0]
+        bomb2_x = self.bomb2.pos[0]
+        bomb2_y = self.bomb2.pos[0]
+
+        if snake_head_x == bomb_x + 1 and snake_head_y == bomb_y + 1:
+            self.bomb = BOMB()
+        elif snake_head_x == bomb_x - 1 and snake_head_y == bomb_y - 1:
+            self.bomb = BOMB()
+        
+        if snake_head_x == bomb2_x + 1 and snake_head_y == bomb2_y + 1:
+            self.bomb2 = BOMB()
+        elif snake_head_x == bomb2_x - 1 and snake_head_y == bomb2_y - 1:
+            self.bomb2 = BOMB()
+        
         if self.bomb.pos == self.snake.body[0]:
             self.gameOver()
             self.snake = SNAKE()
-            self.fruit = FRUIT() 
-            self.fruit2 = FRUIT()
-            self.fruit3 = FRUIT()
-
+        
+        if self.bomb2.pos == self.snake.body[0]:
+            self.gameOver()
+            self.snake = SNAKE()
+        
     def check_hitWall(self):
         for cor in self.snake.body[0]:
             if cor in self.boundary:
-                print(self.snake.body[0])
                 self.gameOver()
                 self.snake = SNAKE()
-                self.fruit = FRUIT()
-                self.fruit2 = FRUIT()
-                self.fruit3 = FRUIT()
-    
-    def check_hitSelf(self):
-        for p in self.snake.body[1:]:
-            if self.snake.body[0] == p:
-                continue
-
+    def gameStart(self):
+        color = (0,0,0)
+        display_surface = pygame.display.set_mode((screen_width, screen_width))
+        pygame.display.set_caption('GAME START')
+        image = pygame.image.load('opening.jpg').convert_alpha()
+        image_rect = image.get_rect()
+        screen_rect = screen.get_rect()
+        image_rect.center = screen_rect.center
+        temp = 10000
+        while temp > 0:
+            display_surface.fill(color)
+            display_surface.blit(image, image_rect)
+            temp -= 1
+            for event in pygame.event.get():
+                # if event.type == pygame.QUIT:
+                    # pygame.quit()
+                    # quit()   
+                pygame.display.update()
     def gameOver(self):
         pygame.time.wait(700)
         color = (0,0,0)
@@ -185,7 +221,7 @@ class MAIN:
         image_rect = image.get_rect()
         screen_rect = screen.get_rect()
         image_rect.center = screen_rect.center
-        temp = 10000
+        temp = 19000
         while temp > 0:
             display_surface.fill(color)
             display_surface.blit(image, image_rect)
@@ -196,21 +232,30 @@ class MAIN:
                     quit()   
                 pygame.display.update()
 
-
 pygame.init()
 cell_size = 20
 cell_number = 20
 screen_width = cell_size * cell_number
+
 screen = pygame.display.set_mode((screen_width,screen_width))
+pygame.display.set_caption('Hungry Snake -- Game Start')
 clock = pygame.time.Clock()
+
 apple = pygame.image.load('apple.png').convert_alpha()
 cherry = pygame.image.load('cherry.png').convert_alpha()
 avocado = pygame.image.load('avocado.png').convert_alpha()
 yuzu = pygame.image.load('yuzu.png').convert_alpha()
 carrott = pygame.image.load('carrott.png').convert_alpha()
 banana = pygame.image.load('banana.png').convert_alpha()
-bomb = pygame.image.load('bomb.png').convert_alpha()
 heart = pygame.image.load('heart.png').convert_alpha()
+heart2 = pygame.image.load('heart2.png').convert_alpha()
+heart3 = pygame.image.load('heart3.png').convert_alpha()
+bomb = pygame.image.load('bomb.png').convert_alpha()
+skull = pygame.image.load('skull.png').convert_alpha()
+poison = pygame.image.load('poison.png').convert_alpha()
+poison2 = pygame.image.load('poison2.png').convert_alpha()
+
+
 game_font = pygame.font.Font('PoetsenOne-Regular.ttf',25)
 
 SCREEN_UPDATE = pygame.USEREVENT
