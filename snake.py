@@ -1,29 +1,51 @@
 import pygame
 import sys #system functions, e.g. quit(stop running code)
 import random
-import time
 from pygame.math import Vector2
 
 class SNAKE:
     def __init__(self):
-
-        # self.body = [Vector2(5,10),Vector2(6,10),Vector2(7,10)]
         self.direction = random.choice([Vector2(1,0),Vector2(0,1),Vector2(-1,0),Vector2(0,-1)])
         self.x = random.randint(8,14)
         self.y = random.randint(8,14)
         self.head = Vector2(self.x,self.y)
         self.body = [self.head, self.head + self.direction, self.head + 2* self.direction]
         self.snakeColor = (120,120,220)
+
+        self.head_up = pygame.image.load('head_up.png').convert_alpha()
+        self.head_down = pygame.image.load('head_down.png').convert_alpha()
+        self.head_right = pygame.image.load('head_right.png').convert_alpha()
+        self.head_left = pygame.image.load('head_left.png').convert_alpha()
+        self.headImage = self.head_up
+
     def draw_snake(self):
-        for block in self.body:
-            x_pos = int(block.x * cell_size)
-            y_pos = int(block.y * cell_size)
-            snake_rect = pygame.Rect(x_pos,y_pos,cell_size,cell_size)
-            pygame.draw.rect(screen,self.snakeColor,snake_rect)
+        self.update_head_graphics()
+        
+        for index,block in enumerate(self.body):
+            x = int(block.x * cell_size)
+            y = int(block.y * cell_size)
+            block_rect = pygame.Rect(x,y,cell_size,cell_number)
+
+            if index == 0:
+                screen.blit(self.headImage,block_rect)
+            else:
+                pygame.draw.rect(screen,self.snakeColor,block_rect)
+
+    def update_head_graphics(self):
+        if self.direction == Vector2(1,0):
+            self.headImage = self.head_left
+        elif self.direction == Vector2(-1,0):
+            self.headImage = self.head_right
+        elif self.direction == Vector2(0,1):
+            self.headImage = self.head_up
+        elif self.direction == Vector2(0,-1):
+            self.headImage = self.head_down
+
     def move_snake(self):
         body_copy = self.body[:-1]
         body_copy.insert(0,body_copy[0]+self.direction)
         self.body = body_copy[:] 
+
 class FRUIT: 
     def __init__(self):
         self.list = list(range(0,cell_number-2))
@@ -31,46 +53,61 @@ class FRUIT:
         self.x = random.choice(self.randInput)
         self.y = random.choice(self.randInput)
         self.pos = Vector2(self.x,self.y)
-        self.ran = random.randint(0,6)
+        self.ran = random.randint(0,8)
+        self.name = ""
+
     def draw_fruit(self):
-        
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
         if self.ran == 0:
             screen.blit(apple,fruit_rect)
+            self.name = "apple"
         elif self.ran == 1:
             screen.blit(cherry,fruit_rect)
+            self.name = "cherry"
         elif self.ran == 2:
             screen.blit(yuzu,fruit_rect)
+            self.name = "yuzu"
         elif self.ran == 3:
             screen.blit(avocado,fruit_rect)
+            self.name = "avocado"
         elif self.ran == 4:
             screen.blit(carrott,fruit_rect)
+            self.name = "carrott"
         elif self.ran == 5:
             screen.blit(banana,fruit_rect)
+            self.name = "banana"
         elif self.ran == 6:
-            ran2 = random.randint(0,2)
-            if ran2 == 0:
-                screen.blit(heart,fruit_rect)
-            elif ran2 == 1:
-                screen.blit(heart2,fruit_rect)
-            elif ran2 == 2:
-                screen.blit(heart3,fruit_rect)
+            screen.blit(heart,fruit_rect)
+            self.name = "heart"
+        elif self.ran == 7:
+            screen.blit(heart2,fruit_rect)
+            self.name = "heart"
+        elif self.ran == 8:
+            screen.blit(heart3,fruit_rect)
+            self.name = "heart"
+
 class BOMB: 
     def __init__(self):
         self.x = random.randint(2,18)
         self.y = random.randint(2,18)
         self.pos = Vector2(self.x,self.y)
         self.ran = random.randint(0,3)
+        self.name = ""
+         
     def draw_bomb(self):
         bomb_rect = pygame.Rect(int(self.pos.x * cell_size),int(self.pos.y * cell_size),cell_size,cell_size)
         if self.ran == 0:
             screen.blit(bomb,bomb_rect)
+            self.name = "bomb"
         elif self.ran == 1:
             screen.blit(skull,bomb_rect)
+            self.name = "skull"
         elif self.ran == 2:
             screen.blit(poison,bomb_rect)
+            self.name = "poison"
         elif self.ran == 3:
             screen.blit(poison2,bomb_rect)
+            self.name = "poison"
 
 class MAIN:
     def __init__(self):
@@ -127,35 +164,24 @@ class MAIN:
 
     def check_eatFruit(self):
         if self.snake.body[0] == self.fruit.pos: 
-            if self.fruit.ran == 6: 
-                for i in range(3):
-                    new = self.snake.body[-1] + self.snake.direction
-                    self.snake.body.append(new)
-                    i += 1
-            else: 
-                new = self.snake.body[-1] + self.snake.direction
-                self.snake.body.append(new)
+            self.check_Fruit(self.fruit)
             self.fruit = FRUIT()
         elif self.snake.body[0] == self.fruit2.pos:
-            if self.fruit.ran == 6: 
-                for i in range(3):
-                    new = self.snake.body[-1] + self.snake.direction
-                    self.snake.body.append(new)
-                    i += 1
-            else: 
-                new = self.snake.body[-1] + self.snake.direction
-                self.snake.body.append(new)
+            self.check_Fruit(self.fruit2)
             self.fruit2 = FRUIT()
         elif self.snake.body[0] == self.fruit3.pos:
-            if self.fruit.ran == 6: 
-                for i in range(3):
-                    new = self.snake.body[-1] + self.snake.direction
-                    self.snake.body.append(new)
-                    i += 1
-            else: 
+            self.check_Fruit(self.fruit3)
+            self.fruit3 = FRUIT()
+
+    def check_Fruit(self,fruit):
+        if fruit.name == "heart": 
+            for i in range(3):
                 new = self.snake.body[-1] + self.snake.direction
                 self.snake.body.append(new)
-            self.fruit3 = FRUIT()
+                i += 1
+        else: 
+            new = self.snake.body[-1] + self.snake.direction
+            self.snake.body.append(new)
 
     def check_visibility(self): 
         # check if fruit and bomb collide
@@ -172,26 +198,67 @@ class MAIN:
                 f = FRUIT() 
 
     def check_hitBomb(self):
-        snake_head_x = self.snake.body[0][0]
-        snake_head_y = self.snake.body[0][1]
+        if self.snake.body[0] == self.bomb.pos:
+            self.check_Bomb(self.bomb)
+            self.bomb = BOMB()
+        if self.snake.body[0] == self.bomb2.pos:
+            self.check_Bomb(self.bomb2)
+            self.bomb2 = BOMB()
+        if self.snake.body[0] == self.bomb3.pos:
+            self.check_Bomb(self.bomb3)
+            self.bomb3 = BOMB()
+        if self.snake.body[0] == self.bomb4.pos:
+            self.check_Bomb(self.bomb4)
+            self.bomb4 = BOMB()
 
-        for b in self.bombs:
-            bomb_x = b.pos[0]
-            bomb_y = b.pos[1]
-            if snake_head_x == bomb_x + 1 and snake_head_y == bomb_y + 1:
-                b = BOMB()
-            elif snake_head_x == bomb_x - 1 and snake_head_y == bomb_y - 1:
-                b = BOMB()
-        
-        for b in self.bombs:
-            if self.snake.body[0] == b.pos:
-                b = BOMB()
-                if (len(self.snake.body[:-3])) <= 0:
-                    self.gameOver()
-                    self.reinitialize()
-                else:
-                    self.snake.body = self.snake.body[:-3]    
-        
+        # snake_head_x = self.snake.body[0][0]
+        # snake_head_y = self.snake.body[0][1]
+
+        # for b in self.bombs:
+        #     bomb_x = b.pos[0]
+        #     bomb_y = b.pos[1]
+        #     if snake_head_x == bomb_x + 1 and snake_head_y == bomb_y + 1:
+        #         b = BOMB()
+        #     elif snake_head_x == bomb_x - 1 and snake_head_y == bomb_y - 1:
+        #         b = BOMB()
+
+            # if self.snake.body[0] == b.pos:
+            #     if (len(self.snake.body[:-3])) <= 0:
+            #         self.gameOver()
+            #         self.reinitialize()
+            #     else:
+            #         body_copy = self.snake.body
+            #         self.snake.body = body_copy[:-3]    
+            #     b = BOMB()
+    def check_Bomb(self,bomb):
+        if bomb.name == "bomb":
+            pygame.time.wait(300) 
+            self.gameOver()
+            self.reinitialize()
+        elif bomb.name == "poison":
+            if len(self.snake.body) >= 5:
+                temp_body = self.snake.body[:-3]
+                self.snake.body = temp_body
+            else:
+                self.gameOver()
+                self.reinitialize()
+        elif bomb.name == "skull":
+            pygame.time.wait(300) 
+            bomb = BOMB()
+            if self.snake.body[0].y >= cell_number - 5:
+                new_direction = Vector2(0,-1)
+            elif self.snake.body[0].y < 5:
+                new_direction = Vector2(0,1)
+            elif self.snake.body[0].x >= cell_number - 5:
+                new_direction = Vector2(-1,0)
+            elif self.snake.body[0].x < 5:
+                new_direction = Vector2(1,0)
+            else:
+                new_x = self.snake.direction[1]
+                new_y = self.snake.direction[0]
+                new_direction = Vector2[new_x,new_y]
+            self.snake.direction = new_direction
+             
     def check_hitWall(self):
         for cor in self.snake.body[0]:
             if cor in self.boundary:
@@ -296,7 +363,7 @@ while True:
         if event.type == SCREEN_UPDATE:
             main_game.update()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and event.key != pygame.K_DOWN:
+            if event.key == pygame.K_UP:
                 if main_game.snake.direction.y != 1:
                     main_game.snake.direction = Vector2(0,-1)
             elif event.key  == pygame.K_DOWN:
