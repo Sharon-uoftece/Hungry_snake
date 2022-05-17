@@ -131,6 +131,8 @@ class MAIN:
         self.check_hitWall()
         self.check_hitSelf()
         self.check_visibility()
+        self.randomize_Bomb()
+        self.randomize_Fruit()
         self.draw_score()
 
     def draw_elements(self):
@@ -211,25 +213,6 @@ class MAIN:
             self.check_Bomb(self.bomb4)
             self.bomb4 = BOMB()
 
-        # snake_head_x = self.snake.body[0][0]
-        # snake_head_y = self.snake.body[0][1]
-
-        # for b in self.bombs:
-        #     bomb_x = b.pos[0]
-        #     bomb_y = b.pos[1]
-        #     if snake_head_x == bomb_x + 1 and snake_head_y == bomb_y + 1:
-        #         b = BOMB()
-        #     elif snake_head_x == bomb_x - 1 and snake_head_y == bomb_y - 1:
-        #         b = BOMB()
-
-            # if self.snake.body[0] == b.pos:
-            #     if (len(self.snake.body[:-3])) <= 0:
-            #         self.gameOver()
-            #         self.reinitialize()
-            #     else:
-            #         body_copy = self.snake.body
-            #         self.snake.body = body_copy[:-3]    
-            #     b = BOMB()
     def check_Bomb(self,bomb):
         if bomb.name == "bomb":
             pygame.time.wait(300) 
@@ -256,7 +239,8 @@ class MAIN:
             else:
                 new_x = self.snake.direction[1]
                 new_y = self.snake.direction[0]
-                new_direction = Vector2[new_x,new_y]
+                new_direction = Vector2(new_x,new_y)
+
             self.snake.direction = new_direction
              
     def check_hitWall(self):
@@ -264,7 +248,29 @@ class MAIN:
             if cor in self.boundary:
                 self.gameOver()
                 self.reinitialize()
-                
+
+    def randomize_Fruit(self):
+        snake_x = self.snake.body[0][0]
+        snake_y = self.snake.body[0][1]
+        if snake_x == self.fruit.pos.x + 2 and snake_y == self.fruit.pos.y + 2:
+            self.fruit = FRUIT()
+        if snake_x == self.fruit2.pos.x + 2 and snake_y == self.fruit2.pos.y - 2:
+            self.fruit2 = FRUIT()
+        if snake_x == self.fruit3.pos.x - 2 and snake_y == self.fruit3.pos.y + 2:
+            self.fruit3 = FRUIT()
+    
+    def randomize_Bomb(self):
+        snake_x = self.snake.body[0][0]
+        snake_y = self.snake.body[0][1]
+        if snake_x == self.bomb.pos.x + 2 and snake_y == self.bomb.pos.y + 2:
+            self.bomb = BOMB()
+        if snake_x == self.bomb2.pos.x - 2 and snake_y == self.bomb2.pos.y - 2:
+            self.bomb2 = BOMB()
+        if snake_x == self.bomb3.pos.x + 1 and snake_y == self.bomb3.pos.y + 1:
+            self.bomb3 = BOMB()
+        if snake_x == self.bomb4.pos.x - 1 and snake_y == self.bomb4.pos.y - 1:
+            self.bomb4 = BOMB()
+        
     def gameStart(self):
         color = (0,0,0)
         display_surface = pygame.display.set_mode((screen_width, screen_width))
@@ -311,10 +317,6 @@ class MAIN:
                 self.snake.body = self.snake.body[:index]
             index += 1
 
-            # if self.snake.body[0] == self.snake.body[p]:
-            #     temp = self.snake.body[:p].copy()
-            #     self.snake.body = temp
-
     def reinitialize(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
@@ -324,7 +326,6 @@ class MAIN:
         self.bomb2 = BOMB()
         self.bomb3 = BOMB()
         self.bomb4 = BOMB()
-
 
 pygame.init()
 cell_size = 20
