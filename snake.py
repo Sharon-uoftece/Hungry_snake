@@ -12,34 +12,12 @@ class SNAKE:
         self.body = [self.head, self.head + self.direction, self.head + 2* self.direction]
         self.snakeColor = (120,120,220)
 
-        self.head_up = pygame.image.load('head_up.png').convert_alpha()
-        self.head_down = pygame.image.load('head_down.png').convert_alpha()
-        self.head_right = pygame.image.load('head_right.png').convert_alpha()
-        self.head_left = pygame.image.load('head_left.png').convert_alpha()
-        self.headImage = self.head_up
-
     def draw_snake(self):
-        self.update_head_graphics()
-        
-        for index,block in enumerate(self.body):
+        for block in self.body:
             x = int(block.x * cell_size)
             y = int(block.y * cell_size)
             block_rect = pygame.Rect(x,y,cell_size,cell_number)
-
-            if index == 0:
-                screen.blit(self.headImage,block_rect)
-            else:
-                pygame.draw.rect(screen,self.snakeColor,block_rect)
-
-    def update_head_graphics(self):
-        if self.direction == Vector2(1,0):
-            self.headImage = self.head_left
-        elif self.direction == Vector2(-1,0):
-            self.headImage = self.head_right
-        elif self.direction == Vector2(0,1):
-            self.headImage = self.head_up
-        elif self.direction == Vector2(0,-1):
-            self.headImage = self.head_down
+            pygame.draw.rect(screen,self.snakeColor,block_rect)
 
     def move_snake(self):
         body_copy = self.body[:-1]
@@ -88,8 +66,8 @@ class FRUIT:
 
 class BOMB: 
     def __init__(self):
-        self.x = random.randint(2,18)
-        self.y = random.randint(2,18)
+        self.x = random.randint(4,17)
+        self.y = random.randint(4,17)
         self.pos = Vector2(self.x,self.y)
         self.ran = random.randint(0,3)
         self.name = ""
@@ -185,8 +163,8 @@ class MAIN:
             new = self.snake.body[-1] + self.snake.direction
             self.snake.body.append(new)
 
+    ####### NEED TO FIX########
     def check_visibility(self): 
-        # check if fruit and bomb collide
         check_Fruit = []
         check_Bomb = []
         for f in self.fruits:
@@ -215,7 +193,7 @@ class MAIN:
 
     def check_Bomb(self,bomb):
         if bomb.name == "bomb":
-            pygame.time.wait(300) 
+            pygame.time.wait(600) 
             self.gameOver()
             self.reinitialize()
         elif bomb.name == "poison":
@@ -226,16 +204,16 @@ class MAIN:
                 self.gameOver()
                 self.reinitialize()
         elif bomb.name == "skull":
-            pygame.time.wait(300) 
+            pygame.time.wait(700) 
             bomb = BOMB()
-            if self.snake.body[0].y >= cell_number - 5:
-                new_direction = Vector2(0,-1)
-            elif self.snake.body[0].y < 5:
-                new_direction = Vector2(0,1)
-            elif self.snake.body[0].x >= cell_number - 5:
-                new_direction = Vector2(-1,0)
-            elif self.snake.body[0].x < 5:
-                new_direction = Vector2(1,0)
+            if self.snake.body[0].y >= cell_number - 5 and self.snake.direction != Vector2(0,1):
+                new_direction = Vector2(0,-1) #up
+            elif self.snake.body[0].y < 5 and self.snake.direction != Vector2(1,0):
+                new_direction = Vector2(0,1) #down 
+            elif self.snake.body[0].x >= cell_number - 5 and self.snake.direction != Vector2(1,0):
+                new_direction = Vector2(-1,0) #left
+            elif self.snake.body[0].x < 5 and self.snake.direction != Vector2(-1,0):
+                new_direction = Vector2(1,0) #right
             else:
                 new_x = self.snake.direction[1]
                 new_y = self.snake.direction[0]
@@ -270,25 +248,6 @@ class MAIN:
             self.bomb3 = BOMB()
         if snake_x == self.bomb4.pos.x - 1 and snake_y == self.bomb4.pos.y - 1:
             self.bomb4 = BOMB()
-        
-    def gameStart(self):
-        color = (0,0,0)
-        display_surface = pygame.display.set_mode((screen_width, screen_width))
-        pygame.display.set_caption('GAME START')
-        image = pygame.image.load('opening.jpg').convert_alpha()
-        image_rect = image.get_rect()
-        screen_rect = screen.get_rect()
-        image_rect.center = screen_rect.center
-        temp = 10000
-        while temp > 0:
-            display_surface.fill(color)
-            display_surface.blit(image, image_rect)
-            temp -= 1
-            for event in pygame.event.get():
-                # if event.type == pygame.QUIT:
-                    # pygame.quit()
-                    # quit()   
-                pygame.display.update()
 
     def gameOver(self):
         pygame.time.wait(700)
@@ -349,6 +308,19 @@ bomb = pygame.image.load('bomb.png').convert_alpha()
 skull = pygame.image.load('skull.png').convert_alpha()
 poison = pygame.image.load('poison.png').convert_alpha()
 poison2 = pygame.image.load('poison2.png').convert_alpha()
+
+head_up = pygame.image.load('head_up.png').convert_alpha()
+head_down = pygame.image.load('head_down.png').convert_alpha()
+head_left = pygame.image.load('head_left.png').convert_alpha()
+head_right = pygame.image.load('head_right.png').convert_alpha()
+
+body_horizontal = pygame.image.load('body_horizontal.png').convert_alpha()
+body_vertical = pygame.image.load('body_vertical.png').convert_alpha()
+
+tail_up = pygame.image.load('tail_up.png').convert_alpha()
+tail_down = pygame.image.load('tail_down.png').convert_alpha()
+tail_left = pygame.image.load('tail_left.png').convert_alpha()
+tail_right = pygame.image.load('tail_right.png').convert_alpha()
 
 game_font = pygame.font.Font('PoetsenOne-Regular.ttf',25)
 
